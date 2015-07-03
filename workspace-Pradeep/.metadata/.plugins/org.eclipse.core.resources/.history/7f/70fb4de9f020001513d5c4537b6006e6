@@ -1,0 +1,37 @@
+package tneb;
+
+public class ReportDto {
+	
+   private String custId=null;
+   private String startId = null;
+   private String endId = null;
+   private String bill = null;
+   
+public String getCustId() {
+	return custId;
+}
+public void setCustId(String custId) {
+	this.custId = custId;
+}
+public String getStartId() {
+	return startId;
+}
+public void setStartId(String startId) {
+	this.startId = startId;
+}
+public String getEndId() {
+	return endId;
+}
+public void setEndId(String endId) {
+	this.endId = endId;
+}
+public String getBill() {
+	return bill;
+}
+public void setBill(String bill) {
+	this.bill = bill;
+}
+   
+		   
+
+}

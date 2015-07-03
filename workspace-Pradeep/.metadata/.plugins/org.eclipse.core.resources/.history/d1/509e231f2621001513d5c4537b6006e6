@@ -1,0 +1,37 @@
+package tneb;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+public class BatchDao {
+
+	public void batchInsert(){
+		System.out.println("Inside batchInsert()###");
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 
+			
+			Connection con = null;
+			PreparedStatement pst = null;
+			ResultSet rs = null;			
+			con = DriverManager.getConnection(url_db,user,pass);
+			for(){
+				String query = "insert into customer_report values (?,?,?,?)";
+				pst = con.prepareStatement(query);
+				pst.setString(1, );
+				pst.setString(2, x);
+				pst.setString(3, x);
+				pst.setString(4, x);
+				pst.addBatch();				
+			}
+			pst.executeBatch();
+			
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}
+	}
+}
