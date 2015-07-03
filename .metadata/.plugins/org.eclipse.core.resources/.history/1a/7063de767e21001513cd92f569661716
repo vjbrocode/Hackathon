@@ -1,0 +1,78 @@
+package brocode.billing;
+
+import java.io.IOException;
+import java.util.Collections;
+import java.util.LinkedList;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+
+public class TotalMeterReading {
+	public static int nthOccurrence(String str, char c, int n) {
+	    int pos = str.indexOf(c, 0);
+	    while (n-- > 0 && pos != -1)
+	        pos = str.indexOf(c, pos+1);
+	    return pos;
+	}
+	
+	public static synchronized String findMinMaxReading(String id, String val) {
+		String[] meterVal = val.split(";");
+    	LinkedList<Integer> minList = new LinkedList<Integer>();
+    	LinkedList<Integer> maxList = new LinkedList<Integer>();
+        minList.add(Integer.parseInt(meterVal[0]));
+        maxList.add(Integer.parseInt(meterVal[1]));
+		return Collections.min(minList,null) + " " + Collections.max(maxList,null);
+	}
+	
+	public static class TokenizerMapper
+       extends Mapper<LongWritable, Text, String, String>{
+
+    public void map(LongWritable key, Text value, Context context
+                    ) throws IOException, InterruptedException {
+      String line = value.toString();
+      String id = line.substring(0, line.indexOf(","));
+      String meterRead1 = line.substring(nthOccurrence(line, ',', 1), nthOccurrence(line, ',', 2));
+      String meterRead2 = line.substring(nthOccurrence(line, ',', 3));
+      context.write(id, meterRead1.replaceAll(",", "") + ";" + meterRead2.replaceAll(",", ""));
+    }
+  }
+
+  public static class IntReducer
+       extends Reducer<String,String,String,String> {
+    private String result = new String();
+
+    public void reduce(LongWritable key, Iterable<String> values,
+                       Context context
+                       ) throws IOException, InterruptedException {
+      for (String val : values) {
+        // findMinAndMaxReading
+    	  result = findMinMaxReading(key.toString(), val);
+      }
+      context.write(key.toString(), result);
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
+    Configuration conf = new Configuration();
+    //Job job = new job.setInputFormatClass(ExcelInputFormat.class);
+
+    Job job = new Job(conf, "Billing");
+    job.setJarByClass(TotalMeterReading.class);
+    job.setMapperClass(TokenizerMapper.class);
+    job.setCombinerClass(IntReducer.class);
+    job.setReducerClass(IntReducer.class);
+    job.setOutputKeyClass(LongWritable.class);
+    job.setOutputValueClass(String.class);
+    FileInputFormat.addInputPath(job, new Path(args[0]));
+    FileOutputFormat.setOutputPath(job, new Path(args[1]));
+    System.exit(job.waitForCompletion(true) ? 0 : 1);
+  }
+}

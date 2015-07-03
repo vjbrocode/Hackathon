@@ -1,0 +1,28 @@
+package brocode.billing;
+
+import java.util.Collections;
+import java.util.LinkedList;
+
+public class UnitTest {
+	public static int nthOccurrence(String str, char c, int n) {
+	    int pos = str.indexOf(c, 0);
+	    while (n-- > 0 && pos != -1)
+	        pos = str.indexOf(c, pos+1);
+	    return pos;
+	}
+	public static String findMinMaxReading(String id, String val) {
+		String[] meterVal = val.split(";");
+    	LinkedList<Integer> minList = new LinkedList<Integer>();
+    	LinkedList<Integer> maxList = new LinkedList<Integer>();
+        minList.add(Integer.parseInt(meterVal[0]));
+        maxList.add(Integer.parseInt(meterVal[1]));
+		return Collections.min(minList,null) + " " + Collections.max(maxList,null);
+	}
+	public static void main(String arg[]) {
+		String line = "";
+	      String id = line.substring(0, line.indexOf(","));
+	      String meterRead1 = line.substring(nthOccurrence(line, ',', 2), nthOccurrence(line, ',', 3));
+	      String meterRead2 = line.substring(nthOccurrence(line, ',', 4));
+	      System.out.println("mapper : " + id + ":" + meterRead1 + ";" + meterRead2);
+	}
+}

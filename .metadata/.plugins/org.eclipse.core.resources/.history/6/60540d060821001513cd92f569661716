@@ -1,0 +1,121 @@
+package com.test;
+
+import java.io.FileInputStream;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+
+public class ExcelRead {
+public static void main(String arg[]) {
+	try {
+	HashMap<Integer, Double> upperRateLimit = new HashMap<Integer,Double>();
+	HashMap<Integer, Integer> meterID = new HashMap<Integer,Integer>();
+	String file = "C:\\Users\\Administrator\\workspace\\Test\\lib\\testfile.xls";
+    POIFSFileSystem fs = new POIFSFileSystem(new FileInputStream(file));
+    HSSFWorkbook wb = new HSSFWorkbook(fs);
+		try {
+		    HSSFSheet sheet = wb.getSheet("rate table");
+		    HSSFRow row;
+		    HSSFCell cell;
+	
+		    int rows; // No of rows
+		    rows = sheet.getPhysicalNumberOfRows();
+	
+		    int cols = 0; // No of columns
+		    int tmp = 0;
+	
+		    // This trick ensures that we get the data properly even if it doesn't start from first few rows
+		    for(int i = 0; i < 10 || i < rows; i++) {
+		        row = sheet.getRow(i);
+		        if(row != null) {
+		            tmp = sheet.getRow(i).getPhysicalNumberOfCells();
+		            if(tmp > cols) cols = tmp;
+		        }
+		    }
+	
+		    for(int r = 1; r < rows; r++) {
+		        row = sheet.getRow(r);
+		        if(row != null) {
+	                cell = row.getCell(2);
+	                if(cell != null) {
+	                    // Your code here
+	                	System.out.println("cell " + r + ":" + cell);
+	                	if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()){
+	                		try {
+	                			upperRateLimit.put((int) row.getCell(1).getNumericCellValue(), row.getCell(2).getNumericCellValue());
+	                		} catch (Exception e) {
+	                			upperRateLimit.put(0, row.getCell(2).getNumericCellValue());
+	                			System.out.println("hmexception " + "0" + ":" + row.getCell(2).getNumericCellValue());
+	                		}
+	                		System.out.println("hm " + (int) row.getCell(1).getNumericCellValue() + ":" + row.getCell(2).getNumericCellValue());
+	                	}
+		            }
+		        }
+		    }
+		} catch(Exception ioe) {
+		    ioe.printStackTrace();
+		}
+		try {
+		    HSSFSheet sheet = wb.getSheet("usage template");
+		    HSSFRow row;
+		    HSSFCell cell;
+	
+		    int rows; // No of rows
+		    rows = sheet.getPhysicalNumberOfRows();
+	
+		    int cols = 0; // No of columns
+		    int tmp = 0;
+	
+		    // This trick ensures that we get the data properly even if it doesn't start from first few rows
+		    for(int i = 0; i < 10 || i < rows; i++) {
+		        row = sheet.getRow(i);
+		        if(row != null) {
+		            tmp = sheet.getRow(i).getPhysicalNumberOfCells();
+		            if(tmp > cols) cols = tmp;
+		        }
+		    }
+	
+		    for(int r = 0; r < rows; r++) {
+		        row = sheet.getRow(r);
+		        if(row != null) {
+	                cell = row.getCell(0);
+	                if(cell != null) {
+	                    // Your code here
+	                	if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()){
+		                	meterID.put((int) cell.getNumericCellValue(),r);
+		                	System.out.println("hm " + r+ ":" + cell.getNumericCellValue());
+	                	}
+	                }
+		        }
+		    }
+		    
+		    for(int r = 0; r < rows; r++) {
+		        row = sheet.getRow(r);
+		        if(row != null) {
+	                cell = row.getCell(2);
+	                if(cell != null) {
+	                    // Your code here
+	                	for (int id: meterID.keySet()){
+	        	            int value = meterID.get(id);
+	        	            System.out.println("check point");
+	        	            if(id == (int)row.getCell(0).getNumericCellValue());
+	        	            System.out.println("unique " + value + " " + row.getCell(2));  
+	        		    }
+	                }
+	            }
+		    }
+		} catch(Exception ioe) {
+		    ioe.printStackTrace();
+		}
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+}
+}

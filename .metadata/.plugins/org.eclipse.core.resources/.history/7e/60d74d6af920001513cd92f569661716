@@ -1,0 +1,30 @@
+package com.test;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Vector;
+
+public class VectorAdd {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Vector<String> v = new Vector<String>();
+		
+		v.add("Robert");
+		v.add("Fine");
+
+		Vector<Vector<String>> outer = new Vector<Vector<String>>();
+		
+		outer.add(v);
+		System.out.println(outer);
+		
+		Collections.sort(outer,new Comparator<Vector<String>>() {
+			public int compare(Vector<String> v1, Vector<String> v2){
+				return v1.get(0).compareTo(v2.get(0));
+			}
+		});
+	}
+
+}

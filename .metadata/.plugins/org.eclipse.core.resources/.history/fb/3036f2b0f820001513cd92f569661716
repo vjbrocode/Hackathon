@@ -1,0 +1,19 @@
+package com.test;
+
+import java.util.Vector;
+
+public class VectorAdd {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Vector<String> v = new Vector<String>();
+		
+		v.add("Robert");
+		v.add("Fine");
+
+		Vector<Vector<String>> outer = new Vector<Vector<String>>();
+	}
+
+}

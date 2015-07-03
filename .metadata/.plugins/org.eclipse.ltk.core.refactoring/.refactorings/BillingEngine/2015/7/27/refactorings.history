@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;BillingEngine/lib/Sample usage file.xls&apos; to &apos;Sampleusagefile.xls&apos;" description="Rename resource &apos;Sample usage file.xls&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="lib/Sample usage file.xls" name="Sampleusagefile.xls" stamp="1435923554094" updateReferences="true"/>
+</session>
