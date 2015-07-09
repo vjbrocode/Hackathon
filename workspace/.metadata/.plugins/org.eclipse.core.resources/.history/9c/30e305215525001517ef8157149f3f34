@@ -1,0 +1,13 @@
+package eb;
+
+public class FirstTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		String st= "";
+		
+		System.out.print("test :"+st.length());
+	}
+
+}

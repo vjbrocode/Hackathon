@@ -1,0 +1,15 @@
+package sqoopdata;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+
+	public List<ReportDto> getTotalUsageAll() {
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		
+		return recordList;
+	}
+}

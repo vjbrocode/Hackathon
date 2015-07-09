@@ -1,0 +1,44 @@
+package sqoopdata;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
+
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+
+	public List<ReportDto> getTotalUsageAll() {
+		System.out.println("Inside batchInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;		
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 			
+			con = DriverManager.getConnection(url_db,user,pass);
+			String query = "select cust_id, total_units from customer_usage";
+			pst = con.prepareStatement(query);
+			pst.executeBatch();
+			
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}finally{
+			con.close();
+			pst.close();
+		}
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		ReportDto dto = null;
+		
+		dto = new ReportDto();
+		dto.setCustId(Integer.toString(id));
+		dto.setStartId(Integer.toString(valuemin));
+		dto.setEndId(Integer.toString(valuemax));
+		dto.setMonth("June");
+		return recordList;
+	}
+}

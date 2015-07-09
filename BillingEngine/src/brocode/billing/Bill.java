@@ -29,7 +29,7 @@ public class Bill {
         String meterRead1 = line.substring(nthOccurrence(line, ',', 1), nthOccurrence(line, ',', 2));
         String meterRead2 = line.substring(nthOccurrence(line, ',', 3));
         int meterReading = Integer.parseInt(meterRead2.replaceAll(",", "")) - Integer.parseInt(meterRead1.replaceAll(",", ""));
-        context.write(new Text(id), new IntWritable(meterReading));
+        context.write(new Text(id+","), new IntWritable(meterReading));
     }
   }
 

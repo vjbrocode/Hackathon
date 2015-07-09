@@ -1,0 +1,212 @@
+package sqoopdata;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import tneb.BillCalculator;
+import tneb.BillGenerator;
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+	
+	public String generateBills(String custId) throws Exception {
+		
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		if(custId.length() !=0){
+			  String[] arrayId = custId.split(",");
+		     recordList = processSearchQuery(arrayId);	
+		}else{
+			recordList = getTotalUsageForAll();
+		}
+		
+		float rate1 = 0 ;
+		float rate2 = 0;
+		float rate3 = 0;
+		float rate4 = 0;
+		
+		//get unit per charge
+		BillCalculator billObj = new BillCalculator();
+		List<HashMap<String, String>> rateObj =  billObj.getPerUnitCharge();	
+		
+		for (HashMap<String, String> hashMap : rateObj) {
+			int endTire = Integer.parseInt(hashMap.get("end"));
+			//System.out.println("Map end : "+endTire);
+			if(endTire < 301){
+				rate1 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 300 && endTire < 601){
+				rate2 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 600 && endTire < 1001){
+				rate3 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 1000 || endTire == 0){
+				rate4 = Float.valueOf(hashMap.get("rate"));
+			}
+		}
+		BillGenerator billObj1 = new BillGenerator();
+		for (ReportDto report : recordList) {
+			calculateBill(report,rate1,rate2,rate3,rate4);
+			billObj1.getCustomerProfile(report);
+		}		
+		
+		String billHtml="";
+		for (ReportDto dto : recordList) {
+			String html = generateHadoopBill(dto);
+			billHtml = billHtml + html;
+		}
+		return billHtml;
+	}
+	
+	// Can move this to Dao, but not really needed.
+	public static List<ReportDto> getTotalUsageForAll() throws Exception {
+		System.out.println("Inside batchInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		ReportDto dto = null;
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 			
+			con = DriverManager.getConnection(url_db,user,pass);
+			String query = "select cust_id, total_units from customer_usage";
+			pst = con.prepareStatement(query);
+			rs = pst.executeQuery();
+			while(rs.next()) {
+				dto = new ReportDto();
+				dto.setCustId(rs.getString("cust_id").trim());
+				dto.setUnit(rs.getString("total_units").trim());
+				recordList.add(dto);
+			}
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}finally{
+			rs.close();
+			con.close();
+			pst.close();
+		}
+		
+		return recordList;
+	}
+	
+	//select userdetails on cust search
+		public java.util.List<ReportDto> processSearchQuery(String[] custIds) throws SQLException{
+			System.out.println("inside processSearchQuery () ### ");
+			ArrayList<ReportDto> userlist = null;
+			Connection con = null;
+			PreparedStatement pst = null;
+			ResultSet rs = null;
+			try{
+				Class.forName("com.mysql.jdbc.Driver");
+				final String url_db = "jdbc:mysql://localhost:3306/world";
+			    final String user = "scoot";
+				final String pass = "Tiger"; 
+				
+				con = DriverManager.getConnection(url_db,user,pass);
+				if(custIds.length==1){
+					String query = "select * from customer_usage where cust_id in (?) ";			
+					pst = con.prepareStatement(query);
+					pst.setString(1, custIds[0]);
+				}else{
+					String query = "select * from customer_usage where cust_id in (?,?,?) ";			
+					pst = con.prepareStatement(query);
+					for(int i=0 ; i< custIds.length ; i++){
+						pst.setString(i+1, custIds[i]);
+					}
+				}
+				rs = pst.executeQuery();
+				userlist = new ArrayList<ReportDto>();			
+				ReportDto userDetails = null;
+				while(rs.next()){
+					userDetails = new ReportDto();
+					userDetails.setCustId(rs.getString("cust_id").trim());
+					userDetails.setUnit(rs.getString("total_units").trim());
+					userlist.add(userDetails);
+				}
+				
+			}catch(Exception e){
+				System.out.println("Exception "+e);
+			}finally{
+				con.close();
+				pst.close();
+				rs.close();
+			}
+			return userlist;
+		}
+	
+	//calc bill
+	public void calculateBill(ReportDto reportDto , float rate1 , float rate2 ,float rate3,float rate4){
+		System.out.println("Inside calcuateBil() #### ");
+		double bill1 = 0;
+		double bill2 = 0;
+		double bill3 = 0;
+		double bill4 = 0;		
+		
+		//int start = Integer.parseInt(reportDto.getStartId());
+		//int end = Integer.parseInt(reportDto.getEndId());		
+		//int diff = end - start; 
+		
+		int diff = Integer.parseInt(reportDto.getUnit());
+		
+		System.out.println(diff);
+		
+		for(int i=1 ; i < diff ; i++){
+			if(i < 301){
+				bill1 = bill1 + rate1;
+			}
+			if(i > 301 && i < 601){
+				bill2 = bill2 + rate2;
+			}
+			if(i > 601 && i < 1001){
+				bill3 = bill3 + rate3;
+			}
+			if(i > 1000){
+				bill4 = bill4 + rate4;
+			}			
+		}
+		
+		double finalBill = bill1 + bill2 + bill3+ bill4;		
+		double taxvalue = (finalBill * 0.1);		
+		reportDto.setBill(finalBill+taxvalue);		
+		//System.out.println("End of calcuateBil() #### ");
+	}
+	
+    public String generateHadoopBill(ReportDto reportDto){
+
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("<html><head><style>");
+		buffer.append("#customers {font-family: Arial, Helvetica, sans-serif;width: 70%; border-collapse: collapse;} ");
+		buffer.append(" #customers td, #customers th {font-size: 1em; border: 1px solid #98bf21;padding: 3px 7px 2px 7px;} ");  
+		buffer.append(" #customers th {font-size: 1.1em;text-align: left;padding-top: 5px; padding-bottom: 4px;padding-left:20px; ");     
+		buffer.append(" background-color: #A7C942;color: #ffffff; } #customers tr.alt td {color: #000000; ");
+		buffer.append(" background-color: #EAF2D3; } </style> </head> <body> <table id='customers'><tr> ");
+		buffer.append(" <th style='width:10%'>TNEB</th><th style='width:80%'>EB-Bill-July</th> </tr> ");  
+		buffer.append(" <tr><th style='background-color:white;color:black;border:none' colspan=2></th> </tr> ");      
+		buffer.append(" <tr><th style='background-color:white;color:black; width:40%' colspan=>Customer Id :");
+		buffer.append(reportDto.getCustId());
+		buffer.append("</th>");
+		//buffer.append(reportDto.getStartId());
+		buffer.append("</tr>");
+		buffer.append("<tr><th style='background-color:white;color:black' colspan=>Name :");
+		buffer.append(reportDto.getName());
+		buffer.append("</th><th style='background-color:white;color:black;'>Total Units :");
+		buffer.append(reportDto.getUnit());
+		buffer.append("</th></tr>");
+		buffer.append("<tr><th style='background-color:white;color:black' colspan=>Address : ");
+		buffer.append(reportDto.getAddress());
+		buffer.append("</th> <th style='background-color:white;color:black;'>Tax :10%</th></tr>");
+		buffer.append("<tr><th style='background-color:white;color:black;float:right' colspan=2>Bill:");
+		buffer.append(reportDto.getBill()); 
+		buffer.append("</th></tr></table></html>");
+		buffer.append("<html><tabe><tr><td></td></tr></table></html>");
+		            
+		return buffer.toString();
+	}
+}

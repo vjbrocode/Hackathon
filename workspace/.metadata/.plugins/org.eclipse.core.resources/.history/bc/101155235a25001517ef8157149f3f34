@@ -1,0 +1,28 @@
+package eb;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class FirstTest {
+
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		
+		String location = "C:\\Users\\samplefile.txt";
+		File file1 = new File(location);
+		StringBuffer content = new StringBuffer();
+		
+		FileWriter writer = new FileWriter(file1);
+		
+		for(int i=0 ; i < 10; i++ ){
+			content.append(i+",06/01/15 12:00 AM,"+(i+2)+"06/01/15 11:59 PM,\n"+(i+4));
+			//content.append("\n");
+		}		
+		writer.write(content.toString());
+		writer.flush();
+		writer.close();
+		
+	} 
+
+}

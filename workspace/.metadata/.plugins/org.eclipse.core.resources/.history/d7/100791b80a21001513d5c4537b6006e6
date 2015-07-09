@@ -1,0 +1,121 @@
+package tneb;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class BillCalculator {
+   
+	public void generateBill(){
+		System.out.println("Inside generateBill() ###");
+		
+		BillGenerator billObj = new BillGenerator();
+		List<ReportDto> list = new ArrayList<ReportDto>();
+		list = billObj.processQuery();
+		float rate1 = 0 ;
+		float rate2 = 0;
+		float rate3 = 0;
+		float rate4 = 0;
+		
+		//get unit per charge
+		List<HashMap<String, String>> rateObj =  getPerUnitCharge();	
+		
+		for (HashMap<String, String> hashMap : rateObj) {
+			int endTire = Integer.parseInt(hashMap.get("end"));
+			System.out.println("Map end : "+endTire);
+			if(endTire < 301){
+				rate1 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 300 && endTire < 601){
+				rate2 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 600 && endTire < 1001){
+				rate3 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 1000 || endTire == 0){
+				rate4 = Float.valueOf(hashMap.get("rate"));
+			}
+		}
+		BillGenerator billObj1 = new BillGenerator();
+		for (ReportDto reportDto : list) {
+			calculateBill(reportDto,rate1,rate2,rate3,rate4);
+			billObj1.getCustomerProfile(reportDto);
+		}				
+		//create one method to return result 
+		
+		
+	}
+	
+	public void calculateBill(ReportDto reportDto , float rate1 , float rate2 ,float rate3,float rate4){
+		System.out.println("Inside calcuateBil() #### ");
+		double bill1 = 0;
+		double bill2 = 0;
+		double bill3 = 0;
+		double bill4 = 0;		
+		
+		int start = Integer.parseInt(reportDto.getStartId());
+		int end = Integer.parseInt(reportDto.getEndId());		
+		int diff = start - end ;	
+		System.out.println(diff);
+		
+		for(int i=1 ; i < diff ; i++){
+			if(i < 301){
+				bill1 = bill1 + rate1;
+			}
+			if(i < 601){
+				bill2 = bill2 + rate2;
+			}
+			if(i < 1001){
+				bill3 = bill3 + rate3;
+			}
+			if(i > 1000){
+				bill4 = bill4 + rate4;
+			}
+			double finalBill = bill1 + bill2 + bill3+ bill4;
+			
+			double taxvalue = (finalBill * 0.1);
+			
+			System.out.println(finalBill+taxvalue);
+			
+			reportDto.setBill(finalBill+taxvalue);
+		}	
+		System.out.println("End of calcuateBil() #### ");
+	}
+	
+	public ArrayList<HashMap<String, String>> getPerUnitCharge(){
+		System.out.println("Inside getPerUnitCharge() ###");
+		
+		ArrayList<HashMap<String, String>> rate = null;
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 
+			
+			Connection con = null;
+			PreparedStatement pst = null;
+			ResultSet rs = null;
+			
+			con = DriverManager.getConnection(url_db,user,pass);
+			String query = "select * from rate_per_unit";
+			pst = con.prepareStatement(query);
+			rs = pst.executeQuery();
+		    rate = new ArrayList<>();
+			HashMap<String, String> unitRate = null;
+			while(rs.next()){
+				unitRate = new HashMap<String,String>();
+				unitRate.put("Start",(rs.getString("tier_start").length() !=0 )? rs.getString("tier_start"): "");
+				unitRate.put("end", (rs.getString("tier_end").length()!=0)? rs.getString("tier_end") : "1001");
+				unitRate.put("rate",(rs.getString("per_unit").length() !=0 )? rs.getString("per_unit"): "");	
+				rate.add(unitRate);
+			}
+			
+		}catch(Exception e){
+			System.out.println("Exception inside getPerUnitChage()####"+e);
+		}
+		
+		return rate;
+		
+	}
+}

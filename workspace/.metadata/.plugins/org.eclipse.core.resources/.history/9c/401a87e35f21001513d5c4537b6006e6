@@ -1,0 +1,73 @@
+package tneb;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+
+public class BatchDao {
+
+	public void batchReportInsert(List<ReportDto> totalList) throws SQLException{
+		System.out.println("Inside batchInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;			
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 
+			
+			con = DriverManager.getConnection(url_db,user,pass);
+			for(ReportDto reportDto : totalList) {
+				String query = "insert into customer_report values (?,?,?,?)";
+				pst = con.prepareStatement(query);
+				pst.setString(1,reportDto.getCustId());
+				pst.setString(2,reportDto.getStartId());
+				pst.setString(3,reportDto.getEndId());
+				pst.setString(4,reportDto.getMonth());
+				pst.addBatch();		
+			}
+			pst.executeBatch();
+			
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}finally{
+			con.close();
+			pst.close();
+		}
+	}
+	
+	public void batchProfileInsert(List<ReportDto> totalProfile) throws SQLException{
+		System.out.println("Inside batchProfileInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;		
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 
+			
+			con = DriverManager.getConnection(url_db,user,pass);
+			for(ReportDto reportDto : totalProfile) {
+				String query = "insert into customer_profile values (?,?,?)";
+				pst = con.prepareStatement(query);
+				pst.setString(1,reportDto.getCustId());
+				pst.setString(2,reportDto.getName());
+				pst.setString(3,reportDto.getAddress());
+				pst.addBatch();		
+			}
+			pst.executeBatch();
+			
+		}catch(Exception e){
+			System.out.println("Exception batchProfileInsert() ### "+e);
+		}finally{
+			con.close();
+			pst.close();
+		}
+	}
+}

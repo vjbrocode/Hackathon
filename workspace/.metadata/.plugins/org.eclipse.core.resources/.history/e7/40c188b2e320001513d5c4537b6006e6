@@ -1,0 +1,12 @@
+package tneb;
+
+public class ReportDto {
+	
+   private String custId=null;
+   private String startId = null;
+   private String endId = null;
+   private String bill = null;
+   
+		   
+
+}

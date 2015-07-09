@@ -1,0 +1,130 @@
+package sqoopdata;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import tneb.BillGenerator;
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+
+	
+	public String generateBills() throws Exception {
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		recordList = getTotalUsageForAll();
+		
+		float rate1 = 0 ;
+		float rate2 = 0;
+		float rate3 = 0;
+		float rate4 = 0;
+		
+		//get unit per charge
+		List<HashMap<String, String>> rateObj =  getPerUnitCharge();	
+		
+		for (HashMap<String, String> hashMap : rateObj) {
+			int endTire = Integer.parseInt(hashMap.get("end"));
+			//System.out.println("Map end : "+endTire);
+			if(endTire < 301){
+				rate1 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 300 && endTire < 601){
+				rate2 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 600 && endTire < 1001){
+				rate3 = Float.valueOf(hashMap.get("rate"));
+			}else if(endTire > 1000 || endTire == 0){
+				rate4 = Float.valueOf(hashMap.get("rate"));
+			}
+		}
+		BillGenerator billObj1 = new BillGenerator();
+		for (ReportDto report : recordList) {
+			calculateBill(report,rate1,rate2,rate3,rate4);
+			billObj1.getCustomerProfile(report);
+		}		
+		
+		String billHtml="";
+		for (ReportDto dto : recordList) {
+			
+		}
+		return billHtml;
+	}
+	
+	// Can move this to Dao, but not really needed.
+	public static List<ReportDto> getTotalUsageForAll() throws Exception {
+		System.out.println("Inside batchInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		ReportDto dto = null;
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 			
+			con = DriverManager.getConnection(url_db,user,pass);
+			String query = "select cust_id, total_units from customer_usage";
+			pst = con.prepareStatement(query);
+			rs = pst.executeQuery();
+			while(rs.next()) {
+				dto = new ReportDto();
+				dto.setCustId(rs.getString("cust_id").trim());
+				dto.setUnit(rs.getString("total_units").trim());
+				recordList.add(dto);
+			}
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}finally{
+			rs.close();
+			con.close();
+			pst.close();
+		}
+		
+		return recordList;
+	}
+	
+	//calc bill
+	public void calculateBill(ReportDto reportDto , float rate1 , float rate2 ,float rate3,float rate4){
+		System.out.println("Inside calcuateBil() #### ");
+		double bill1 = 0;
+		double bill2 = 0;
+		double bill3 = 0;
+		double bill4 = 0;		
+		
+		//int start = Integer.parseInt(reportDto.getStartId());
+		//int end = Integer.parseInt(reportDto.getEndId());		
+		//int diff = end - start; 
+		
+		int diff = Integer.parseInt(reportDto.getUnit());
+		
+		System.out.println(diff);
+		
+		for(int i=1 ; i < diff ; i++){
+			if(i < 301){
+				bill1 = bill1 + rate1;
+			}
+			if(i > 301 && i < 601){
+				bill2 = bill2 + rate2;
+			}
+			if(i > 601 && i < 1001){
+				bill3 = bill3 + rate3;
+			}
+			if(i > 1000){
+				bill4 = bill4 + rate4;
+			}			
+		}
+		
+		double finalBill = bill1 + bill2 + bill3+ bill4;		
+		double taxvalue = (finalBill * 0.1);		
+		reportDto.setBill(finalBill+taxvalue);		
+		//System.out.println("End of calcuateBil() #### ");
+	}
+	
+    public void generateHadoopBill(){
+		
+	}
+}

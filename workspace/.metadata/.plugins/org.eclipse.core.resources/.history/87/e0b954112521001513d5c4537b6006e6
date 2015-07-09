@@ -1,0 +1,8 @@
+package tneb;
+
+public class BatchDao {
+
+	public void batchInsert(){
+		
+	}
+}

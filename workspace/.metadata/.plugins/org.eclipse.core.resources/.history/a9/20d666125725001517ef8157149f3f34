@@ -1,0 +1,24 @@
+package eb;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class FirstTest {
+
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		
+		String location = "C:\\Users\\samplefile.txt";
+		File file1 = new File(location);
+		String content = "test";
+		
+		FileWriter writer = new FileWriter(file1);
+		
+		writer.write(content);
+		writer.flush();
+		writer.close();
+		
+	} 
+
+}

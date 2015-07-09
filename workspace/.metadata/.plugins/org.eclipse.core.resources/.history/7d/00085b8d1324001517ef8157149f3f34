@@ -1,0 +1,55 @@
+package sqoopdata;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+
+	public void generateBills() throws Exception {
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		recordList = getTotalUsageForAll();
+		for (ReportDto dto : recordList) {
+			
+		}
+	}
+	
+	public static List<ReportDto> getTotalUsageForAll() throws Exception {
+		System.out.println("Inside batchInsert()###");
+
+		Connection con = null;
+		PreparedStatement pst = null;
+		ResultSet rs = null;
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		ReportDto dto = null;
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			final String url_db = "jdbc:mysql://localhost:3306/world";
+		    final String user = "scoot";
+			final String pass = "Tiger"; 			
+			con = DriverManager.getConnection(url_db,user,pass);
+			String query = "select cust_id, total_units from customer_usage";
+			pst = con.prepareStatement(query);
+			rs = pst.executeQuery();
+			while(rs.next()) {
+				dto = new ReportDto();
+				dto.setCustId(rs.getString("cust_id").trim());
+				dto.setUnit(rs.getString("total_units").trim());
+				recordList.add(dto);
+			}
+		}catch(Exception e){
+			System.out.println("Exception batchInsert() ### "+e);
+		}finally{
+			rs.close();
+			con.close();
+			pst.close();
+		}
+		
+		return recordList;
+	}
+}

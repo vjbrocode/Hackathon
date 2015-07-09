@@ -1,0 +1,21 @@
+package sqoopdata;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import tneb.ReportDto;
+
+public class GenerateDirectBill {
+
+	public List<ReportDto> getTotalUsageAll() {
+		List<ReportDto> recordList = new ArrayList<ReportDto>();
+		ReportDto dto = null;
+		
+		dto = new ReportDto();
+		dto.setCustId(Integer.toString(id));
+		dto.setStartId(Integer.toString(valuemin));
+		dto.setEndId(Integer.toString(valuemax));
+		dto.setMonth("June");
+		return recordList;
+	}
+}

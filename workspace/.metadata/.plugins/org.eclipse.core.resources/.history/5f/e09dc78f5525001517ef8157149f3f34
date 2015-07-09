@@ -1,0 +1,14 @@
+package eb;
+
+import java.io.File;
+
+public class FirstTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+		String location = "C:\\Users\\samplefile.txt";
+		File file1 = new File(location);
+	}
+
+}

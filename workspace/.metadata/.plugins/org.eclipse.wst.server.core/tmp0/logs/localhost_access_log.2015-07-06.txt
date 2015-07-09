@@ -1,0 +1,20 @@
+113.128.164.3 - - [06/Jul/2015:08:26:36 -0700] "-" 400 -
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:31:34 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:31:58 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:31:59 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:32:00 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:33:24 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:12:33:24 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2962
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:13:58:59 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 2966
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:13:59:01 -0700] "GET /favicon.ico HTTP/1.1" 404 973
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:00:51 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3067
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:00:58 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3067
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:01:05 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3067
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:01:05 -0700] "GET /favicon.ico HTTP/1.1" 404 973
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:06:20 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3171
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:11:29 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3175
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:12:06 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3175
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:12:11 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3175
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:12:17 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3175
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:14:25 -0700] "POST /TNEB_billing/serv/bill HTTP/1.1" 200 7923
+0:0:0:0:0:0:0:1 - - [06/Jul/2015:14:15:47 -0700] "GET /TNEB_billing/BillReport.jsp HTTP/1.1" 200 3227
